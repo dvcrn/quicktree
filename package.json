@@ -16,6 +16,9 @@
   ],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.3.0"
+  },
   "devDependencies": {
     "mocha": "^11.5.0"
   }

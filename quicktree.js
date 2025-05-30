@@ -4,21 +4,75 @@ const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const { parseArgs } = require("util");
 const { sanitizeBranchName, constructTargetDir } = require("./lib");
 
-const args = process.argv.slice(2);
+// Parse command line arguments
+const { values, positionals } = parseArgs({
+  options: {
+    list: {
+      type: "boolean",
+      short: "l",
+    },
+    prune: {
+      type: "boolean",
+      short: "p",
+    },
+    help: {
+      type: "boolean",
+      short: "h",
+    },
+  },
+  allowPositionals: true,
+});
 
-if (args.length === 0) {
-  console.error("Usage: quicktree <title>");
+// Handle help
+if (values.help) {
+  console.log("Usage: quicktree <title> [options]");
+  console.log("");
+  console.log("Options:");
+  console.log("  -l, --list    List all worktrees");
+  console.log("  -p, --prune   Prune worktrees");
+  console.log("  -h, --help    Show help");
+  process.exit(0);
+}
+
+// Handle list command
+if (values.list) {
+  try {
+    execSync("git worktree list", { stdio: "inherit" });
+  } catch (error) {
+    console.error("Error listing worktrees:", error.message);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+// Handle prune command
+if (values.prune) {
+  try {
+    execSync("git worktree prune", { stdio: "inherit" });
+    console.log("Worktrees pruned successfully");
+  } catch (error) {
+    console.error("Error pruning worktrees:", error.message);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+// Handle worktree creation
+if (positionals.length === 0) {
+  console.error("Usage: quicktree <title> [options]");
+  console.error("Try 'quicktree --help' for more information.");
   process.exit(1);
 }
 
-if (args.length > 1) {
+if (positionals.length > 1) {
   console.error("Error: Only one argument (the title) is supported.");
   process.exit(1);
 }
 
-const title = args[0];
+const title = positionals[0];
 
 // Check if we're in a git repository
 try {

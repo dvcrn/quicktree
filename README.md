@@ -18,26 +18,12 @@ quicktree <title>
 
 Creates a new worktree at `~/worktrees/<project>-<title>` (or `$QUICKTREE_DIR/<project>-<title>` if set).
 
-## Auto-cd Setup
-
-To automatically change directory into the worktree, add this function to your shell config (`~/.bashrc`, `~/.zshrc`, etc.):
+### Additional Commands
 
 ```bash
-quicktree() {
-    local output=$(command quicktree "$@" 2>&1)
-    local exit_code=$?
-    
-    echo "$output"
-    
-    if [ $exit_code -eq 0 ]; then
-        local cd_command=$(echo "$output" | grep "^cd " | tail -n 1)
-        if [ -n "$cd_command" ]; then
-            eval "$cd_command"
-        fi
-    fi
-    
-    return $exit_code
-}
+quicktree --list     # List all worktrees (short: -l)
+quicktree --prune    # Prune worktrees (short: -p)
+quicktree --help     # Show help (short: -h)
 ```
 
 ## Features
