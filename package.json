@@ -1,7 +1,7 @@
 {
   "name": "quicktree",
   "version": "1.0.0",
-  "description": "CLI tool for easier Git worktree management",
+  "description": "CLI tool for easier Git worktree management. Create, list, and prune Git worktrees with automatic directory organization and branch sanitization.",
   "main": "quicktree.js",
   "bin": {
     "quicktree": "./quicktree.js"
@@ -12,10 +12,16 @@
   "keywords": [
     "git",
     "worktree",
-    "cli"
+    "cli",
+    "developer-tools",
+    "git-workflow"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "David Mohl <git@d.sh>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dvcrn/quicktree.git"
+  },
   "engines": {
     "node": ">=18.3.0"
   },
