@@ -17,3 +17,7 @@ link:
 # Unlink after development
 unlink:
   npm unlink
+
+# Run tests
+test:
+  npx mocha __tests__/lib.test.js

@@ -4,11 +4,17 @@ const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const { sanitizeBranchName, constructTargetDir } = require("./lib");
 
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
   console.error("Usage: quicktree <title>");
+  process.exit(1);
+}
+
+if (args.length > 1) {
+  console.error("Error: Only one argument (the title) is supported.");
   process.exit(1);
 }
 
@@ -30,8 +36,11 @@ const projectName = path.basename(currentDir);
 const worktreeBaseDir =
   process.env.QUICKTREE_DIR || path.join(os.homedir(), "worktrees");
 
-// Construct worktree path
-const worktreePath = path.join(worktreeBaseDir, `${projectName}-${title}`);
+const worktreePath = constructTargetDir({
+  worktreeBaseDir,
+  projectName,
+  title,
+});
 
 // Check if worktree already exists
 if (fs.existsSync(worktreePath)) {
@@ -47,8 +56,9 @@ try {
     fs.mkdirSync(worktreeBaseDir, { recursive: true });
   }
 
-  // Create worktree with new branch
-  const command = `git worktree add "${worktreePath}" -b "${title}"`;
+  // Create worktree with new branch (sanitized name)
+  const branchName = sanitizeBranchName(title);
+  const command = `git worktree add "${worktreePath}" -b "${branchName}"`;
   execSync(command, { stdio: "inherit" });
 
   console.log(`\nWorktree created at: ${worktreePath}`);
