@@ -15,18 +15,8 @@ A CLI tool for easier Git worktree management. Create, list, and prune Git workt
 
 ## Installation
 
-### From source
-
 ```bash
-npm install -g .
-# or
-just install
-```
-
-### From npm (when published)
-
-```bash
-npm install -g quicktree
+npm install -g quicktree-cli
 ```
 
 ## Usage
