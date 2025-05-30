@@ -56,17 +56,22 @@ if (values.list) {
 // Handle info command
 if (values.info) {
   try {
+    // Check if we're in a git repository
+    execSync("git rev-parse --git-dir", { stdio: "pipe" });
+
     const output = execSync("git worktree list", { encoding: "utf8" });
     const lines = output.trim().split("\n");
-    const worktrees = lines.map((line) => {
-      const parts = line.split(/\s+/);
-      return path.basename(parts[0]);
-    });
 
-    console.log(`Available worktrees: ${worktrees.join(", ")}`);
+    // Only show output if there are worktrees
+    if (lines.length > 0 && lines[0]) {
+      const worktrees = lines.map((line) => {
+        const parts = line.split(/\s+/);
+        return path.basename(parts[0]);
+      });
+      console.log(`Available worktrees: ${worktrees.join(", ")}`);
+    }
   } catch (error) {
-    console.error("Error getting worktree info:", error.message);
-    process.exit(1);
+    // Silently exit if not in git repo or no worktrees
   }
   process.exit(0);
 }
