@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { sanitizeBranchName, constructTargetDir } = require("../lib");
+const { sanitizeBranchName, constructTargetDir } = require("./lib");
 
 describe("sanitizeBranchName", () => {
   const cases = [
