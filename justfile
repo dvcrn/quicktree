@@ -20,4 +20,4 @@ unlink:
 
 # Run tests
 test:
-  npx mocha lib.test.js
+  npm test

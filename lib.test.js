@@ -26,10 +26,10 @@ describe("sanitizeBranchName", () => {
     });
   });
 
-  it('should trim leading and trailing spaces', () => {
-    assert.strictEqual(sanitizeBranchName('   foo-bar   '), 'foo-bar');
-    assert.strictEqual(sanitizeBranchName('   foo   '), 'foo');
-    assert.strictEqual(sanitizeBranchName('\n\tfoo\t\n'), 'foo');
+  it("should trim leading and trailing spaces", () => {
+    assert.strictEqual(sanitizeBranchName("   foo-bar   "), "foo-bar");
+    assert.strictEqual(sanitizeBranchName("   foo   "), "foo");
+    assert.strictEqual(sanitizeBranchName("\n\tfoo\t\n"), "foo");
   });
 });
 
@@ -39,38 +39,82 @@ describe("constructTargetDir", () => {
     const project = "myproj";
     const title = "feature-x";
     const expected = "/tmp/worktrees/myproj-feature-x";
-    const result = constructTargetDir({ worktreeBaseDir: base, projectName: project, title });
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
     // On Windows, path.join uses backslashes, so normalize for test
     const normalized = require("path").normalize(expected);
     assert.strictEqual(result, normalized);
   });
 
-  it("should handle spaces in title", () => {
+  it("should sanitize spaces in title", () => {
     const base = "/tmp/wt";
     const project = "foo";
     const title = "bar baz";
-    const expected = "/tmp/wt/foo-bar baz";
-    const result = constructTargetDir({ worktreeBaseDir: base, projectName: project, title });
+    const expected = "/tmp/wt/foo-bar-baz";
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
     const normalized = require("path").normalize(expected);
     assert.strictEqual(result, normalized);
   });
 
-  it("should trim spaces in projectName and title", () => {
+  it("should sanitize and trim spaces in projectName and title", () => {
     const base = "/tmp/trim";
     const project = "   myproj   ";
     const title = "   feature-x   ";
     const expected = "/tmp/trim/myproj-feature-x";
-    const result = constructTargetDir({ worktreeBaseDir: base, projectName: project, title });
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
     const normalized = require("path").normalize(expected);
     assert.strictEqual(result, normalized);
   });
 
-  it("should trim tabs and newlines in projectName and title", () => {
+  it("should sanitize tabs and newlines in projectName and title", () => {
     const base = "/tmp/trim2";
     const project = "\n\tfoo\t\n";
     const title = "\n\tbar\t\n";
     const expected = "/tmp/trim2/foo-bar";
-    const result = constructTargetDir({ worktreeBaseDir: base, projectName: project, title });
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
+    const normalized = require("path").normalize(expected);
+    assert.strictEqual(result, normalized);
+  });
+
+  it("should sanitize special characters in project and title", () => {
+    const base = "/tmp/special";
+    const project = "My Project!";
+    const title = "Feature XYZ #123";
+    const expected = "/tmp/special/my-project-feature-xyz-123";
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
+    const normalized = require("path").normalize(expected);
+    assert.strictEqual(result, normalized);
+  });
+
+  it("should handle mixed case and special characters", () => {
+    const base = "/tmp/mixed";
+    const project = "CamelCase_Project";
+    const title = "Bug Fix/Issue @456";
+    const expected = "/tmp/mixed/camelcase-project-bug-fix-issue-456";
+    const result = constructTargetDir({
+      worktreeBaseDir: base,
+      projectName: project,
+      title,
+    });
     const normalized = require("path").normalize(expected);
     assert.strictEqual(result, normalized);
   });

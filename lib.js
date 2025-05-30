@@ -3,18 +3,27 @@
 const path = require("path");
 
 /**
- * Sanitize a string to be a valid git branch name.
- * Replaces spaces and special characters with hyphens, lowercases, and trims.
- * @param {string} name
+ * Sanitize a string by replacing spaces and special characters with hyphens.
+ * Converts to lowercase, trims whitespace, and normalizes hyphens.
+ * @param {string} str
  * @returns {string}
  */
-function sanitizeBranchName(name) {
-  return name
+function sanitizeString(str) {
+  return str
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "-") // Replace non-alphanumeric with hyphens
     .replace(/-+/g, "-") // Replace multiple hyphens with single
     .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+}
+
+/**
+ * Sanitize a string to be a valid git branch name.
+ * @param {string} name
+ * @returns {string}
+ */
+function sanitizeBranchName(name) {
+  return sanitizeString(name);
 }
 
 /**
@@ -26,10 +35,13 @@ function sanitizeBranchName(name) {
  * @returns {string}
  */
 function constructTargetDir({ worktreeBaseDir, projectName, title }) {
-  return path.join(worktreeBaseDir, `${projectName.trim()}-${title.trim()}`);
+  const sanitizedProject = sanitizeString(projectName);
+  const sanitizedTitle = sanitizeString(title);
+  return path.join(worktreeBaseDir, `${sanitizedProject}-${sanitizedTitle}`);
 }
 
 module.exports = {
+  sanitizeString,
   sanitizeBranchName,
   constructTargetDir,
 };

@@ -7,7 +7,7 @@
     "quicktree": "./quicktree.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha lib.test.js"
   },
   "keywords": [
     "git",
