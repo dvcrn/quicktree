@@ -1,0 +1,15 @@
+{
+  "name": "quicktree",
+  "version": "1.0.0",
+  "description": "CLI tool for easier Git worktree management",
+  "main": "quicktree.js",
+  "bin": {
+    "quicktree": "./quicktree.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["git", "worktree", "cli"],
+  "author": "",
+  "license": "ISC"
+}
