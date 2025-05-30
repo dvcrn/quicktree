@@ -18,6 +18,10 @@ const { values, positionals } = parseArgs({
       type: "boolean",
       short: "p",
     },
+    info: {
+      type: "boolean",
+      short: "i",
+    },
     help: {
       type: "boolean",
       short: "h",
@@ -32,6 +36,7 @@ if (values.help) {
   console.log("");
   console.log("Options:");
   console.log("  -l, --list    List all worktrees");
+  console.log("  -i, --info    Show available worktrees (compact)");
   console.log("  -p, --prune   Prune worktrees");
   console.log("  -h, --help    Show help");
   process.exit(0);
@@ -43,6 +48,24 @@ if (values.list) {
     execSync("git worktree list", { stdio: "inherit" });
   } catch (error) {
     console.error("Error listing worktrees:", error.message);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+// Handle info command
+if (values.info) {
+  try {
+    const output = execSync("git worktree list", { encoding: "utf8" });
+    const lines = output.trim().split("\n");
+    const worktrees = lines.map((line) => {
+      const parts = line.split(/\s+/);
+      return path.basename(parts[0]);
+    });
+
+    console.log(`Available worktrees: ${worktrees.join(", ")}`);
+  } catch (error) {
+    console.error("Error getting worktree info:", error.message);
     process.exit(1);
   }
   process.exit(0);

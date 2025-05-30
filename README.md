@@ -44,6 +44,7 @@ Creates a new worktree at `~/worktrees/<project>-<title>` (or `$QUICKTREE_DIR/<p
 
 ```bash
 quicktree --list     # List all worktrees (short: -l)
+quicktree --info     # Show available worktrees (compact) (short: -i)
 quicktree --prune    # Prune worktrees (short: -p)
 quicktree --help     # Show help (short: -h)
 ```
@@ -59,6 +60,9 @@ quicktree "New Feature!"    # → branch: new-feature, dir: myproject-new-featur
 # List all worktrees
 quicktree -l
 
+# Show available worktrees (compact)
+quicktree -i  # Output: Available worktrees: myproject-main, myproject-feature-xyz, myproject-bug-fix
+
 # Clean up stale worktree references
 quicktree -p
 ```
@@ -72,6 +76,43 @@ Set the `QUICKTREE_DIR` environment variable to change the base directory:
 ```bash
 export QUICKTREE_DIR="/path/to/my/worktrees"
 quicktree "feature"  # Creates /path/to/my/worktrees/myproject-feature
+```
+
+### Auto-show worktrees on directory change
+
+To automatically display available worktrees when entering a Git repository, add the following to your shell configuration:
+
+#### Bash (`~/.bashrc`)
+
+```bash
+cd() {
+    builtin cd "$@"
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        quicktree -i 2>/dev/null
+    fi
+}
+```
+
+#### Zsh (`~/.zshrc`)
+
+```zsh
+cd() {
+    builtin cd "$@"
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        quicktree -i 2>/dev/null
+    fi
+}
+```
+
+#### Fish (`~/.config/fish/config.fish`)
+
+```fish
+function cd
+    builtin cd $argv
+    if git rev-parse --git-dir >/dev/null 2>&1
+        quicktree -i 2>/dev/null
+    end
+end
 ```
 
 ## Requirements
