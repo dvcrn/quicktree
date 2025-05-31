@@ -123,21 +123,24 @@ To automatically change into the worktree directory after creation or when findi
 
 ```bash
 quicktree() {
-    local output=$(command quicktree --path-only "$@")
-    local exit_code=$?
-    
-    if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
-        # Extract the path from the last line of output
-        local path=$(echo "$output" | tail -n 1)
-        # Print the output (minus the path line) for user feedback
-        echo "$output" | head -n -1
-        # Change to the worktree directory
-        if [ -d "$path" ]; then
-            echo "Changing to: $path"
-            builtin cd "$path"
+    # Check if this is a worktree creation/lookup command (no flags starting with -)
+    if [[ $# -eq 1 && ! "$1" =~ ^- ]]; then
+        local output=$(command quicktree --path-only "$@")
+        local exit_code=$?
+        
+        if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
+            # Extract the path from the last line of output
+            local path=$(echo "$output" | tail -n 1)
+            # Print the output (minus the path line) for user feedback
+            echo "$output" | head -n -1
+            # Change to the worktree directory
+            if [ -d "$path" ]; then
+                echo "Changing to: $path"
+                builtin cd "$path"
+            fi
         fi
     else
-        # Fallback to normal quicktree output for other commands
+        # For other commands (flags), use normal quicktree
         command quicktree "$@"
     fi
 }
@@ -147,21 +150,24 @@ quicktree() {
 
 ```zsh
 quicktree() {
-    local output=$(command quicktree --path-only "$@")
-    local exit_code=$?
-    
-    if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
-        # Extract the path from the last line of output
-        local path=$(echo "$output" | tail -n 1)
-        # Print the output (minus the path line) for user feedback
-        echo "$output" | head -n -1
-        # Change to the worktree directory
-        if [ -d "$path" ]; then
-            echo "Changing to: $path"
-            builtin cd "$path"
+    # Check if this is a worktree creation/lookup command (no flags starting with -)
+    if [[ $# -eq 1 && ! "$1" =~ ^- ]]; then
+        local output=$(command quicktree --path-only "$@")
+        local exit_code=$?
+        
+        if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
+            # Extract the path from the last line of output
+            local path=$(echo "$output" | tail -n 1)
+            # Print the output (minus the path line) for user feedback
+            echo "$output" | head -n -1
+            # Change to the worktree directory
+            if [ -d "$path" ]; then
+                echo "Changing to: $path"
+                builtin cd "$path"
+            fi
         fi
     else
-        # Fallback to normal quicktree output for other commands
+        # For other commands (flags), use normal quicktree
         command quicktree "$@"
     fi
 }
@@ -171,21 +177,24 @@ quicktree() {
 
 ```fish
 function quicktree
-    set -l output (command quicktree --path-only $argv)
-    set -l exit_code $status
-    
-    if test $exit_code -eq 0 -a -n "$output"
-        # Extract the path from the last line of output
-        set -l path (echo "$output" | tail -n 1)
-        # Print the output (minus the path line) for user feedback
-        echo "$output" | head -n -1
-        # Change to the worktree directory
-        if test -d "$path"
-            echo "Changing to: $path"
-            builtin cd "$path"
+    # Check if this is a worktree creation/lookup command (single argument, no flags)
+    if test (count $argv) -eq 1 -a (string sub -s 1 -l 1 $argv[1]) != "-"
+        set -l output (command quicktree --path-only $argv)
+        set -l exit_code $status
+        
+        if test $exit_code -eq 0 -a -n "$output"
+            # Extract the path from the last line of output
+            set -l path (echo "$output" | tail -n 1)
+            # Print the output (minus the path line) for user feedback
+            echo "$output" | head -n -1
+            # Change to the worktree directory
+            if test -d "$path"
+                echo "Changing to: $path"
+                builtin cd "$path"
+            end
         end
     else
-        # Fallback to normal quicktree output for other commands
+        # For other commands (flags), use normal quicktree
         command quicktree $argv
     end
 end
