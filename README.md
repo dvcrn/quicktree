@@ -36,6 +36,8 @@ Creates a new worktree at `~/worktrees/<project>-<title>` (or `$QUICKTREE_DIR/<p
 quicktree --list     # List all worktrees (short: -l)
 quicktree --info     # Show available worktrees (compact) (short: -i)
 quicktree --prune    # Prune worktrees (short: -p)
+quicktree --rm <identifier>    # Remove worktree by identifier (short: -r)
+quicktree --remove <identifier> # Remove worktree by identifier (long form)
 quicktree --help     # Show help (short: -h)
 ```
 
@@ -46,6 +48,14 @@ quicktree --help     # Show help (short: -h)
 quicktree "Feature XYZ"     # → branch: feature-xyz, dir: myproject-feature-xyz
 quicktree "Fix/bug #123"    # → branch: fix-bug-123, dir: myproject-fix-bug-123
 quicktree "New Feature!"    # → branch: new-feature, dir: myproject-new-feature
+
+# Remove worktrees by identifier
+quicktree --rm feature-xyz  # Remove the Feature XYZ worktree
+quicktree -r fix-bug-123    # Remove the Fix/bug #123 worktree (short form)
+quicktree --remove new-feature  # Remove the New Feature! worktree (long form)
+
+# Force remove worktrees (skips safety checks)
+quicktree --rm feature-xyz --force
 
 # List all worktrees
 quicktree -l

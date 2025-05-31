@@ -26,6 +26,17 @@ const { values, positionals } = parseArgs({
       type: "boolean",
       short: "h",
     },
+    rm: {
+      type: "boolean",
+      short: "r",
+    },
+    remove: {
+      type: "boolean",
+    },
+    force: {
+      type: "boolean",
+      short: "f",
+    },
   },
   allowPositionals: true,
 });
@@ -33,11 +44,15 @@ const { values, positionals } = parseArgs({
 // Handle help
 if (values.help) {
   console.log("Usage: quicktree <title> [options]");
+  console.log("       quicktree --rm <identifier> [options]");
   console.log("");
   console.log("Options:");
   console.log("  -l, --list    List all worktrees");
   console.log("  -i, --info    Show available worktrees (compact)");
   console.log("  -p, --prune   Prune worktrees");
+  console.log("  -r, --rm      Remove worktree by identifier");
+  console.log("  --remove      Remove worktree by identifier (long form)");
+  console.log("  -f, --force   Force removal (with --rm/--remove)");
   console.log("  -h, --help    Show help");
   process.exit(0);
 }
@@ -83,6 +98,62 @@ if (values.prune) {
     console.log("Worktrees pruned successfully");
   } catch (error) {
     console.error("Error pruning worktrees:", error.message);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+// Handle remove command
+if (values.rm || values.remove) {
+  if (positionals.length === 0) {
+    console.error("Error: Remove command requires an identifier");
+    console.error("Usage: quicktree --rm <identifier> [--force]");
+    process.exit(1);
+  }
+  
+  if (positionals.length > 1) {
+    console.error("Error: Only one identifier is supported for remove command");
+    process.exit(1);
+  }
+
+  const identifier = positionals[0];
+
+  // Check if we're in a git repository
+  try {
+    execSync("git rev-parse --git-dir", { stdio: "pipe" });
+  } catch (error) {
+    console.error("Error: Not in a git repository");
+    process.exit(1);
+  }
+
+  // Get current directory name (project name)
+  const currentDir = process.cwd();
+  const projectName = path.basename(currentDir);
+
+  // Get worktree directory from environment or use default
+  const worktreeBaseDir =
+    process.env.QUICKTREE_DIR || path.join(os.homedir(), "worktrees");
+
+  const worktreePath = constructTargetDir({
+    worktreeBaseDir,
+    projectName,
+    title: identifier,
+  });
+
+  // Check if worktree exists
+  if (!fs.existsSync(worktreePath)) {
+    console.error(`Error: Worktree '${identifier}' not found at ${worktreePath}`);
+    process.exit(1);
+  }
+
+  // Remove worktree
+  try {
+    const forceFlag = values.force ? " --force" : "";
+    const command = `git worktree remove "${worktreePath}"${forceFlag}`;
+    execSync(command, { stdio: "inherit" });
+    console.log(`Worktree '${identifier}' removed successfully`);
+  } catch (error) {
+    console.error("Error removing worktree:", error.message);
     process.exit(1);
   }
   process.exit(0);
