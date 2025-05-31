@@ -115,6 +115,82 @@ function cd
 end
 ```
 
+### Auto-cd into worktree directory
+
+To automatically change into the worktree directory after creation or when finding an existing worktree, add the following wrapper functions to your shell configuration:
+
+#### Bash (`~/.bashrc`)
+
+```bash
+quicktree() {
+    local output=$(command quicktree --path-only "$@")
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
+        # Extract the path from the last line of output
+        local path=$(echo "$output" | tail -n 1)
+        # Print the output (minus the path line) for user feedback
+        echo "$output" | head -n -1
+        # Change to the worktree directory
+        if [ -d "$path" ]; then
+            echo "Changing to: $path"
+            builtin cd "$path"
+        fi
+    else
+        # Fallback to normal quicktree output for other commands
+        command quicktree "$@"
+    fi
+}
+```
+
+#### Zsh (`~/.zshrc`)
+
+```zsh
+quicktree() {
+    local output=$(command quicktree --path-only "$@")
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ] && [ -n "$output" ]; then
+        # Extract the path from the last line of output
+        local path=$(echo "$output" | tail -n 1)
+        # Print the output (minus the path line) for user feedback
+        echo "$output" | head -n -1
+        # Change to the worktree directory
+        if [ -d "$path" ]; then
+            echo "Changing to: $path"
+            builtin cd "$path"
+        fi
+    else
+        # Fallback to normal quicktree output for other commands
+        command quicktree "$@"
+    fi
+}
+```
+
+#### Fish (`~/.config/fish/config.fish`)
+
+```fish
+function quicktree
+    set -l output (command quicktree --path-only $argv)
+    set -l exit_code $status
+    
+    if test $exit_code -eq 0 -a -n "$output"
+        # Extract the path from the last line of output
+        set -l path (echo "$output" | tail -n 1)
+        # Print the output (minus the path line) for user feedback
+        echo "$output" | head -n -1
+        # Change to the worktree directory
+        if test -d "$path"
+            echo "Changing to: $path"
+            builtin cd "$path"
+        end
+    else
+        # Fallback to normal quicktree output for other commands
+        command quicktree $argv
+    end
+end
+```
+
 ## Requirements
 
 - Node.js 18.3.0 or higher

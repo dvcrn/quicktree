@@ -37,6 +37,9 @@ const { values, positionals } = parseArgs({
       type: "boolean",
       short: "f",
     },
+    "path-only": {
+      type: "boolean",
+    },
   },
   allowPositionals: true,
 });
@@ -53,6 +56,7 @@ if (values.help) {
   console.log("  -r, --rm      Remove worktree by identifier");
   console.log("  --remove      Remove worktree by identifier (long form)");
   console.log("  -f, --force   Force removal (with --rm/--remove)");
+  console.log("  --path-only   Output only the worktree path (for shell integration)");
   console.log("  -h, --help    Show help");
   process.exit(0);
 }
@@ -198,7 +202,11 @@ const worktreePath = constructTargetDir({
 // Check if worktree already exists
 if (fs.existsSync(worktreePath)) {
   console.log(`Found existing worktree: ${worktreePath}`);
-  console.log(`cd ${worktreePath}`);
+  if (values["path-only"]) {
+    console.log(worktreePath);
+  } else {
+    console.log(`cd ${worktreePath}`);
+  }
   process.exit(0);
 }
 
@@ -215,7 +223,11 @@ try {
   execSync(command, { stdio: "inherit" });
 
   console.log(`\nWorktree created at: ${worktreePath}`);
-  console.log(`cd ${worktreePath}`);
+  if (values["path-only"]) {
+    console.log(worktreePath);
+  } else {
+    console.log(`cd ${worktreePath}`);
+  }
 } catch (error) {
   console.error("Error creating worktree:", error.message);
   process.exit(1);
