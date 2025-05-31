@@ -123,8 +123,16 @@ To automatically change into the worktree directory after creation or when findi
 
 ```bash
 quicktree() {
-    # Check if this is a worktree creation/lookup command (no flags starting with -)
-    if [[ $# -eq 1 && ! "$1" =~ ^- ]]; then
+    # Check if this is a worktree creation/lookup command (has arguments, none start with -)
+    local has_flags=false
+    for arg in "$@"; do
+        if [[ "$arg" =~ ^- ]]; then
+            has_flags=true
+            break
+        fi
+    done
+    
+    if [[ $# -gt 0 && $has_flags == false ]]; then
         local output=$(command quicktree --path-only "$@")
         local exit_code=$?
         
@@ -150,8 +158,16 @@ quicktree() {
 
 ```zsh
 quicktree() {
-    # Check if this is a worktree creation/lookup command (no flags starting with -)
-    if [[ $# -eq 1 && ! "$1" =~ ^- ]]; then
+    # Check if this is a worktree creation/lookup command (has arguments, none start with -)
+    local has_flags=false
+    for arg in "$@"; do
+        if [[ "$arg" =~ ^- ]]; then
+            has_flags=true
+            break
+        fi
+    done
+    
+    if [[ $# -gt 0 && $has_flags == false ]]; then
         local output=$(command quicktree --path-only "$@")
         local exit_code=$?
         
@@ -177,8 +193,16 @@ quicktree() {
 
 ```fish
 function quicktree
-    # Check if this is a worktree creation/lookup command (single argument, no flags)
-    if test (count $argv) -eq 1 -a (string sub -s 1 -l 1 $argv[1]) != "-"
+    # Check if this is a worktree creation/lookup command (has arguments, none start with -)
+    set -l has_flags false
+    for arg in $argv
+        if string match -r '^-' $arg >/dev/null
+            set has_flags true
+            break
+        end
+    end
+    
+    if test (count $argv) -gt 0 -a "$has_flags" = false
         set -l output (command quicktree --path-only $argv)
         set -l exit_code $status
         
